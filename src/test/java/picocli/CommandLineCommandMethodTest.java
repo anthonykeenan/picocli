@@ -470,6 +470,38 @@ public class CommandLineCommandMethodTest {
         assertEquals(expected, cmd.getUsageMessage());
     }
 
+    static class ParentCommand extends BaseCommand {
+        @Command(description = "An app specific command.")
+        void specific(@Option(names = {"-l", "--local"}) boolean local,
+                   @Parameters(paramLabel = "<repository>") String repo) {
+            // ... implement business logic
+        }
+    }
+
+    @Command(name = "example", mixinStandardHelpOptions = true,
+            description = "An example app with an inherited base class.")
+    static class BaseCommand {
+        @Command(description = "A generic command.")
+        void generic(@Option(names = {"-l", "--local"}) boolean local,
+                     @Parameters(paramLabel = "<repository>") String repo) {
+            // ... implement business logic
+        }
+    }
+
+    @Test
+    public void testInheritedSubCommands() {
+        CommandLine cmd = new CommandLine(new ParentCommand());
+        String expected = String.format("" +
+                "Usage: example [-hV] [COMMAND]%n" +
+                "An example app with an inherited base class.%n" +
+                "  -h, --help      Show this help message and exit.%n" +
+                "  -V, --version   Print version information and exit.%n" +
+                "Commands:%n" +
+                "  generic   A generic command.%n" +
+                "  specific  An app specific command.%n");
+        assertEquals(expected, cmd.getUsageMessage());
+    }
+
     @Test
     public void testParamIndex() {
         CommandLine git = new CommandLine(new Git());

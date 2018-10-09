@@ -2014,10 +2014,14 @@ public class CommandLine {
         Set<Method> candidates = new TreeSet<Method>(new Comparator<Method>() {
             public int compare(Method o1, Method o2) { return o1.getName().compareTo(o2.getName()); }
         });
-        // traverse public member methods (excludes static/non-public, includes inherited)
-        candidates.addAll(Arrays.asList(Assert.notNull(cls, "class").getMethods()));
-        // traverse directly declared methods (includes static/non-public, excludes inherited)
-        candidates.addAll(Arrays.asList(Assert.notNull(cls, "class").getDeclaredMethods()));
+
+        while (cls != null) {
+            // traverse public member methods (excludes static/non-public, includes inherited)
+            candidates.addAll(Arrays.asList(Assert.notNull(cls, "class").getMethods()));
+            // traverse directly declared methods (includes static/non-public, excludes inherited)
+            candidates.addAll(Arrays.asList(Assert.notNull(cls, "class").getDeclaredMethods()));
+            cls = cls.getSuperclass();
+        }
 
         List<Method> result = new ArrayList<Method>();
         for (Method method : candidates) {
